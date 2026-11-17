@@ -2,19 +2,24 @@
   "name": "hackathon-platform",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/server.js",
-    "dev": "node --watch src/server.js"
+    "start": "tsx src/server.js",
+    "dev": "tsx watch src/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^5.3.0"
+    "@prisma/adapter-pg": "^7.10.1",
+    "@prisma/client": "^7.10.1",
+    "express": "^5.3.0",
+    "pg": "^8.16.3"
   },
   "devDependencies": {
-    "prisma": "^8.0.0-rc.33"
+    "prisma": "^7.10.1",
+    "tsx": "^4.23.15"
   }
 }

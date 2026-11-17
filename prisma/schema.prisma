@@ -1,0 +1,117 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+  moduleFormat = "esm"
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  PARTICIPANT
+  JUDGE
+  ADMIN
+}
+
+enum HackStatus {
+  DRAFT
+  PUBLISHED
+  ONGOING
+  FINISHED
+}
+
+enum TeamRole {
+  CAPTAIN
+  MEMBER
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      Role     @default(PARTICIPANT)
+  memberships Member[]
+  teamsCap  Team[]   @relation("Captain")
+  grades    Grade[]  @relation("Judge")
+  createdAt DateTime @default(now())
+}
+
+model Hackathon {
+  id        String     @id @default(uuid())
+  title     String
+  theme     String
+  startDate DateTime
+  endDate   DateTime
+  status    HackStatus @default(DRAFT)
+  teams     Team[]
+  criteria  Criterion[]
+  createdAt DateTime   @default(now())
+}
+
+model Team {
+  id         String   @id @default(uuid())
+  name       String
+  hackathon  Hackathon @relation(fields: [hackathonId], references: [id])
+  hackathonId String
+  captain    User     @relation("Captain", fields: [captainId], references: [id])
+  captainId  String
+  members    Member[]
+  project    Project?
+  @@unique([hackathonId, name])
+}
+
+model Member {
+  id       String   @id @default(uuid())
+  team     Team     @relation(fields: [teamId], references: [id])
+  teamId   String
+  user     User     @relation(fields: [userId], references: [id])
+  userId   String
+  role     TeamRole @default(MEMBER)
+  status   InviteStatus @default(PENDING)   // PENDING/ACCEPTED
+  @@unique([teamId, userId])
+}
+
+model Project {
+  id          String @id @default(uuid())
+  team        Team   @relation(fields: [teamId], references: [id])
+  teamId      String @unique               // одна команда — один проект
+  title       String
+  description String
+  repoUrl     String
+  submittedAt DateTime @default(now())
+  grades      Grade[]
+}
+
+model Criterion {
+  id          String    @id @default(uuid())
+  name        String
+  maxScore    Int
+  hackathon   Hackathon @relation(fields: [hackathonId], references: [id])
+  hackathonId String
+  grades      Grade[]
+}
+
+model Grade {
+  id          String    @id @default(uuid())
+  project     Project   @relation(fields: [projectId], references: [id])
+  projectId   String
+  judge       User      @relation("Judge", fields: [judgeId], references: [id])
+  judgeId     String
+  criterion   Criterion @relation(fields: [criterionId], references: [id])
+  criterionId String
+  score       Int
+  @@unique([projectId, judgeId, criterionId])  // защита от повторного оценивания
+}
