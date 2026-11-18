@@ -7,6 +7,7 @@ import teamRoutes from './modules/teams/team.routes.js';
 import invitationRoutes from './modules/teams/invitation.routes.js';
 import projectRoutes from './modules/projects/project.routes.js';
 import gradeRoutes from './modules/grades/grade.routes.js';
+import leaderboardRoutes from './modules/leaderboard/leaderboard.routes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
 const app = express();
@@ -25,9 +26,10 @@ app.get('/health', (req, res) => {
 
 // Подключаем модули API
 app.use('/api/auth', authRoutes);
-app.use('/api/hackathons', hackathonRoutes);
 app.use('/api/hackathons/:hackathonId/criteria', criterionRoutes);
 app.use('/api/hackathons/:hackathonId/teams', teamRoutes);
+app.use('/api/hackathons/:hackathonId/leaderboard', leaderboardRoutes);
+app.use('/api/hackathons', hackathonRoutes);
 app.use('/api/teams', teamRoutes);
 app.use('/api/teams/:teamId/project', projectRoutes);
 app.use('/api/projects', projectRoutes);
