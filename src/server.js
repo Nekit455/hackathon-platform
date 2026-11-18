@@ -6,6 +6,7 @@ import criterionRoutes from './modules/criteria/criterion.routes.js';
 import teamRoutes from './modules/teams/team.routes.js';
 import invitationRoutes from './modules/teams/invitation.routes.js';
 import projectRoutes from './modules/projects/project.routes.js';
+import gradeRoutes from './modules/grades/grade.routes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
 const app = express();
@@ -30,6 +31,7 @@ app.use('/api/hackathons/:hackathonId/teams', teamRoutes);
 app.use('/api/teams', teamRoutes);
 app.use('/api/teams/:teamId/project', projectRoutes);
 app.use('/api/projects', projectRoutes);
+app.use('/api/projects/:projectId/grades', gradeRoutes);
 app.use('/api/invitations', invitationRoutes);
 
 // Глобальный обработчик ошибок 
