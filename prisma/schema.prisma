@@ -46,6 +46,7 @@ model User {
   memberships Member[]
   teamsCap  Team[]   @relation("Captain")
   grades    Grade[]  @relation("Judge")
+  hackathonsAsJudge HackathonJudge[]
   createdAt DateTime @default(now())
 }
 
@@ -58,6 +59,7 @@ model Hackathon {
   status    HackStatus @default(DRAFT)
   teams     Team[]
   criteria  Criterion[]
+  judges    HackathonJudge[]
   createdAt DateTime   @default(now())
 }
 
@@ -114,4 +116,13 @@ model Grade {
   criterionId String
   score       Int
   @@unique([projectId, judgeId, criterionId])  // защита от повторного оценивания
+}
+
+model HackathonJudge {
+  hackathon   Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  hackathonId String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+
+  @@id([hackathonId, userId])
 }
