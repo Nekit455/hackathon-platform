@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import authRoutes from './modules/auth/auth.routes.js';
+import hackathonRoutes from './modules/hackathons/hackathon.routes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
 const app = express();
@@ -19,6 +20,7 @@ app.get('/health', (req, res) => {
 
 // Подключаем модули API
 app.use('/api/auth', authRoutes);
+app.use('/api/hackathons', hackathonRoutes);
 
 // Глобальный обработчик ошибок 
 app.use(errorHandler);
