@@ -3,6 +3,8 @@ import express from 'express';
 import authRoutes from './modules/auth/auth.routes.js';
 import hackathonRoutes from './modules/hackathons/hackathon.routes.js';
 import criterionRoutes from './modules/criteria/criterion.routes.js';
+import teamRoutes from './modules/teams/team.routes.js';
+import invitationRoutes from './modules/teams/invitation.routes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
 const app = express();
@@ -23,6 +25,9 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/hackathons', hackathonRoutes);
 app.use('/api/hackathons/:hackathonId/criteria', criterionRoutes);
+app.use('/api/hackathons/:hackathonId/teams', teamRoutes);
+app.use('/api/teams', teamRoutes);
+app.use('/api/invitations', invitationRoutes);
 
 // Глобальный обработчик ошибок 
 app.use(errorHandler);
