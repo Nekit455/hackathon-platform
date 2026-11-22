@@ -1,5 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './config/swagger.js';
 import authRoutes from './modules/auth/auth.routes.js';
 import hackathonRoutes from './modules/hackathons/hackathon.routes.js';
 import criterionRoutes from './modules/criteria/criterion.routes.js';
@@ -25,6 +27,8 @@ app.get('/health', (req, res) => {
 });
 
 // Подключаем модули API
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 app.use('/api/auth', authRoutes);
 app.use('/api/hackathons/:hackathonId/criteria', criterionRoutes);
 app.use('/api/hackathons/:hackathonId/teams', teamRoutes);
