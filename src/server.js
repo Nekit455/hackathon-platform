@@ -1,5 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './config/swagger.js';
 import authRoutes from './modules/auth/auth.routes.js';
@@ -12,21 +14,22 @@ import gradeRoutes from './modules/grades/grade.routes.js';
 import leaderboardRoutes from './modules/leaderboard/leaderboard.routes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// Корневой маршрут для проверки живости
-app.get('/', (req, res) => {
-  res.json({ message: 'Hackathon Platform API', docs: '/docs' });
-});
+//app.get('/', (req, res) => {
+//  res.json({ message: 'Hackathon Platform API', docs: '/docs' });
+//});
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Подключаем модули API
+// Swagger
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/api/auth', authRoutes);
@@ -39,6 +42,9 @@ app.use('/api/teams/:teamId/project', projectRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/projects/:projectId/grades', gradeRoutes);
 app.use('/api/invitations', invitationRoutes);
+
+// Сайт
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Глобальный обработчик ошибок 
 app.use(errorHandler);

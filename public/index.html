@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hackathon Platform</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- Экран авторизации -->
+  <div id="auth-screen" class="screen active">
+    <div class="auth-container">
+      <h1>Hackathon Platform</h1>
+      <div class="tabs">
+        <button id="tab-login" class="tab active">Вход</button>
+        <button id="tab-register" class="tab">Регистрация</button>
+      </div>
+      
+      <form id="form-login" class="auth-form">
+        <input type="email" id="login-email" placeholder="Email" required>
+        <input type="password" id="login-password" placeholder="Пароль" required>
+        <button type="submit" class="btn btn-primary">Войти</button>
+      </form>
+
+      <form id="form-register" class="auth-form hidden">
+        <input type="text" id="register-name" placeholder="Имя" required>
+        <input type="email" id="register-email" placeholder="Email" required>
+        <input type="password" id="register-password" placeholder="Пароль" required>
+        <button type="submit" class="btn btn-success">Зарегистрироваться</button>
+      </form>
+      <div id="auth-message" class="message"></div>
+    </div>
+  </div>
+
+  <!-- Основной экран -->
+  <div id="main-screen" class="screen">
+    <header>
+      <h2>Hackathon Platform</h2>
+      <div class="user-info">
+        <span id="user-name"></span>
+        <span id="user-role" class="badge"></span>
+        <button id="btn-logout" class="btn btn-sm btn-danger">Выйти</button>
+      </div>
+    </header>
+
+    <nav class="tabs-nav">
+      <button class="nav-btn active" data-tab="hackathons">Хакатоны</button>
+      <button class="nav-btn" data-tab="teams">Команды</button>
+      <button class="nav-btn" data-tab="projects">Проекты</button>
+      <button class="nav-btn" data-tab="leaderboard">Лидерборд</button>
+    </nav>
+
+    <main>
+      <!-- Вкладка Хакатоны -->
+      <section id="tab-hackathons" class="tab-content active">
+        <div id="hackathons-list" class="list-container"></div>
+        <!-- Форма создания (только для ADMIN) -->
+        <div id="hackathon-create-form" class="card hidden">
+          <h3>Создать хакатон</h3>
+          <form id="form-create-hackathon">
+            <input type="text" id="hack-title" placeholder="Название" required>
+            <input type="text" id="hack-theme" placeholder="Тема" required>
+            <input type="datetime-local" id="hack-start" required>
+            <input type="datetime-local" id="hack-end" required>
+            <button type="submit" class="btn btn-primary">Создать</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Вкладка Команды -->
+      <section id="tab-teams" class="tab-content">
+        <div class="card">
+          <h3>Мои команды</h3>
+          <div id="teams-list" class="list-container"></div>
+        </div>
+      </section>
+
+      <!-- Вкладка Проекты -->
+      <section id="tab-projects" class="tab-content">
+        <div id="projects-list" class="list-container"></div>
+      </section>
+
+      <!-- Вкладка Лидерборд -->
+      <section id="tab-leaderboard" class="tab-content">
+        <div class="card">
+          <h3>Выберите хакатон для просмотра лидерборда</h3>
+          <select id="leaderboard-hackathon-select"></select>
+          <button id="btn-load-leaderboard" class="btn btn-primary">Загрузить</button>
+          <div id="leaderboard-list" class="list-container"></div>
+        </div>
+      </section>
+    </main>
+    <div id="global-message" class="message"></div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
