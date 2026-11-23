@@ -144,3 +144,12 @@ export const acceptInvitation = async (memberId, userId) => {
     },
   });
 };
+
+export const getMyInvitations = async (userId) => {
+  return prisma.member.findMany({
+    where: { userId, status: 'PENDING' },
+    include: {
+      team: { select: { id: true, name: true } },
+    },
+  });
+};

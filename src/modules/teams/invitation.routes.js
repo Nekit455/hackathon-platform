@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { acceptInvitation } from './team.controller.js';
+import { acceptInvitation, listMyInvitations } from './team.controller.js';
 import { authenticate } from '../../middlewares/auth.js';
 
 const router = Router();
@@ -51,5 +51,7 @@ router.use(authenticate);
  *         description: Приглашение уже было принято
  */
 router.post('/:id/accept', acceptInvitation); // POST /api/invitations/:id/accept
+
+router.get('/', listMyInvitations); // GET /api/invitations
 
 export default router;

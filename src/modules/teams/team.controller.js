@@ -64,3 +64,12 @@ export const acceptInvitation = async (req, res, next) => {
     next(error);
   }
 };
+
+export const listMyInvitations = async (req, res, next) => {
+  try {
+    const invitations = await teamService.getMyInvitations(req.user.id);
+    res.json({ status: 'success', data: { invitations } });
+  } catch (error) {
+    next(error);
+  }
+};

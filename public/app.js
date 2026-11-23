@@ -221,6 +221,162 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
   };
 });
 
+// --- Команды ---
+async function loadTeamsHackathons() {
+  try {
+    const data = await apiCall('/hackathons');
+    const select = document.getElementById('teams-hackathon-select');
+    select.innerHTML = '<option value="">-- Выберите хакатон --</option>';
+    data.data.hackathons.forEach(h => {
+      const opt = document.createElement('option');
+      opt.value = h.id;
+      opt.textContent = h.title;
+      select.appendChild(opt);
+    });
+  } catch (err) { showMessage(err.message, true); }
+}
+
+document.getElementById('teams-hackathon-select').onchange = () => {
+  const hackathonId = document.getElementById('teams-hackathon-select').value;
+  document.getElementById('team-create-form').classList.toggle('hidden', !hackathonId);
+  if (hackathonId) loadTeams(hackathonId);
+};
+
+document.getElementById('btn-load-teams').onclick = () => {
+  const hackathonId = document.getElementById('teams-hackathon-select').value;
+  if (hackathonId) loadTeams(hackathonId);
+};
+
+async function loadTeams(hackathonId) {
+  try {
+    const data = await apiCall(`/hackathons/${hackathonId}/teams`);
+    const container = document.getElementById('teams-list');
+    container.innerHTML = '';
+    if (data.data.teams.length === 0) {
+      container.innerHTML = '<p>В этом хакатоне пока нет команд.</p>';
+      return;
+    }
+    data.data.teams.forEach(t => {
+      const div = document.createElement('div');
+      div.className = 'item-card';
+      const membersStr = t.members.map(m => `${m.user.name} (${m.status})`).join(', ');
+      div.innerHTML = `
+        <h4>${t.name}</h4>
+        <div class="meta"><span>Участники: ${membersStr}</span></div>
+        <div class="actions">
+          ${currentUser.role === 'ADMIN' || t.captainId === currentUser.id ? 
+            `<button class="btn btn-sm btn-primary" onclick="inviteToTeam('${t.id}')">Пригласить</button>` : ''}
+        </div>
+      `;
+      container.appendChild(div);
+    });
+  } catch (err) { showMessage(err.message, true); }
+}
+
+document.getElementById('form-create-team').onsubmit = async (e) => {
+  e.preventDefault();
+  const hackathonId = document.getElementById('teams-hackathon-select').value;
+  if (!hackathonId) return;
+  try {
+    await apiCall(`/hackathons/${hackathonId}/teams`, {
+      method: 'POST',
+      body: JSON.stringify({ name: document.getElementById('team-name').value })
+    });
+    showMessage('Команда создана');
+    loadTeams(hackathonId);
+  } catch (err) { showMessage(err.message, true); }
+};
+
+// Приглашение
+async function inviteToTeam(teamId) {
+  const email = prompt('Введите email участника для приглашения:');
+  if (!email) return;
+  try {
+    await apiCall(`/teams/${teamId}/invitations`, {
+      method: 'POST',
+      body: JSON.stringify({ email })
+    });
+    showMessage('Приглашение отправлено');
+  } catch (err) { showMessage(err.message, true); }
+}
+
+// --- Проекты ---
+async function loadProjectsTeams() {
+  try {
+    const data = await apiCall('/hackathons'); 
+    if (data.data.hackathons.length === 0) return;
+    const firstHackathonId = data.data.hackathons[0].id;
+    
+    // Выбор команды хакатона
+    const teamsData = await apiCall(`/hackathons/${firstHackathonId}/teams`);
+    const select = document.getElementById('projects-team-select');
+    select.innerHTML = '<option value="">-- Выберите команду --</option>';
+    teamsData.data.teams.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.name;
+      select.appendChild(opt);
+    });
+  } catch (err) { /* игнорируем */ }
+}
+
+document.getElementById('projects-team-select').onchange = () => {
+  const teamId = document.getElementById('projects-team-select').value;
+  document.getElementById('project-create-form').classList.toggle('hidden', !teamId);
+  if (teamId) loadProject(teamId);
+};
+
+document.getElementById('btn-load-projects').onclick = () => {
+  const teamId = document.getElementById('projects-team-select').value;
+  if (teamId) loadProject(teamId);
+};
+
+async function loadProject(teamId) {
+  try {
+    const data = await apiCall(`/teams/${teamId}`); 
+    const container = document.getElementById('projects-list');
+    container.innerHTML = '';
+    if (!data.data.team.project) {
+      container.innerHTML = '<p>У этой команды еще нет проекта.</p>';
+      return;
+    }
+    const p = data.data.team.project;
+    container.innerHTML = `
+      <div class="item-card">
+        <h4>${p.title}</h4>
+        <p>${p.description}</p>
+        <div class="meta"><a href="${p.repoUrl}" target="_blank">Репозиторий</a></div>
+      </div>
+    `;
+  } catch (err) { showMessage(err.message, true); }
+}
+
+document.getElementById('form-create-project').onsubmit = async (e) => {
+  e.preventDefault();
+  const teamId = document.getElementById('projects-team-select').value;
+  if (!teamId) return;
+  try {
+    await apiCall(`/teams/${teamId}/project`, {
+      method: 'POST',
+      body: JSON.stringify({
+        title: document.getElementById('project-title').value,
+        description: document.getElementById('project-description').value,
+        repoUrl: document.getElementById('project-repo').value
+      })
+    });
+    showMessage('Проект отправлен');
+    loadProject(teamId);
+  } catch (err) { showMessage(err.message, true); }
+};
+
+// Инициализация вкладок
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.dataset.tab === 'teams') loadTeamsHackathons();
+    if (btn.dataset.tab === 'projects') loadProjectsTeams();
+  });
+});
+
 // --- Запуск ---
 document.addEventListener('DOMContentLoaded', () => {
   if (token) {
@@ -231,4 +387,47 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   initAuth();
   document.getElementById('btn-logout').onclick = logout;
+});
+
+// --- Приглашения ---
+async function loadInvitations() {
+  try {
+    const data = await apiCall('/invitations');
+    const container = document.getElementById('invitations-list');
+    container.innerHTML = '';
+    
+    if (data.data.invitations.length === 0) {
+      container.innerHTML = '<p>У вас нет входящих приглашений.</p>';
+      return;
+    }
+    
+    data.data.invitations.forEach(inv => {
+      const div = document.createElement('div');
+      div.className = 'item-card';
+      div.innerHTML = `
+        <h4>Приглашение в команду "${inv.team.name}"</h4>
+        <div class="actions">
+          <button class="btn btn-sm btn-success" onclick="acceptInvite('${inv.id}')">Принять</button>
+        </div>
+      `;
+      container.appendChild(div);
+    });
+  } catch (err) { showMessage(err.message, true); }
+}
+
+async function acceptInvite(memberId) {
+  try {
+    await apiCall(`/invitations/${memberId}/accept`, { method: 'POST' });
+    showMessage('Приглашение принято!');
+    loadInvitations();
+  } catch (err) { showMessage(err.message, true); }
+}
+
+document.getElementById('btn-load-invitations').onclick = loadInvitations;
+
+// При переключении на вкладку приглашений — загружаем их
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.dataset.tab === 'invitations') loadInvitations();
+  });
 });

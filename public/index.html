@@ -48,6 +48,7 @@
       <button class="nav-btn" data-tab="teams">Команды</button>
       <button class="nav-btn" data-tab="projects">Проекты</button>
       <button class="nav-btn" data-tab="leaderboard">Лидерборд</button>
+      <button class="nav-btn" data-tab="invitations">Приглашения</button>
     </nav>
 
     <main>
@@ -70,14 +71,43 @@
       <!-- Вкладка Команды -->
       <section id="tab-teams" class="tab-content">
         <div class="card">
-          <h3>Мои команды</h3>
-          <div id="teams-list" class="list-container"></div>
+          <h3>Выберите хакатон</h3>
+          <select id="teams-hackathon-select"></select>
+          <button id="btn-load-teams" class="btn btn-primary">Загрузить команды</button>
+        </div>
+        
+        <div id="teams-list" class="list-container"></div>
+        
+        <!-- Форма создания команды (видна, если выбран хакатон) -->
+        <div id="team-create-form" class="card hidden">
+          <h3>Создать команду</h3>
+          <form id="form-create-team">
+            <input type="text" id="team-name" placeholder="Название команды" required>
+            <button type="submit" class="btn btn-success">Создать</button>
+          </form>
         </div>
       </section>
 
       <!-- Вкладка Проекты -->
       <section id="tab-projects" class="tab-content">
+        <div class="card">
+          <h3>Выберите команду</h3>
+          <select id="projects-team-select"></select>
+          <button id="btn-load-projects" class="btn btn-primary">Загрузить проекты</button>
+        </div>
+
         <div id="projects-list" class="list-container"></div>
+
+        <!-- Форма сабмита проекта (для капитана) -->
+        <div id="project-create-form" class="card hidden">
+          <h3>Представить проект</h3>
+          <form id="form-create-project">
+            <input type="text" id="project-title" placeholder="Название проекта" required>
+            <textarea id="project-description" placeholder="Описание" rows="3" required></textarea>
+            <input type="url" id="project-repo" placeholder="Ссылка на репозиторий" required>
+            <button type="submit" class="btn btn-success">Отправить</button>
+          </form>
+        </div>
       </section>
 
       <!-- Вкладка Лидерборд -->
@@ -89,10 +119,18 @@
           <div id="leaderboard-list" class="list-container"></div>
         </div>
       </section>
+
+      <section id="tab-invitations" class="tab-content">
+        <div class="card">
+          <h3>Мои приглашения</h3>
+          <button id="btn-load-invitations" class="btn btn-primary">Обновить</button>
+        </div>
+        <div id="invitations-list" class="list-container"></div>
+      </section>
     </main>
     <div id="global-message" class="message"></div>
   </div>
-
+      
   <script src="/app.js"></script>
 </body>
 </html>
