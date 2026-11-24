@@ -1,5 +1,5 @@
 import { registerSchema, loginSchema } from './auth.schema.js';
-import { registerUser, loginUser } from './auth.service.js';
+import { registerUser, loginUser, getAllUsers } from './auth.service.js';
 
 export const register = async (req, res, next) => {
   try {
@@ -33,6 +33,15 @@ export const getMe = async (req, res, next) => {
   try {
     // req.user уже установлен middleware authenticate
     res.json({ status: 'success', data: { user: req.user } });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const listUsers = async (req, res, next) => {
+  try {
+    const users = await getAllUsers();
+    res.json({ status: 'success', data: { users } });
   } catch (error) {
     next(error);
   }

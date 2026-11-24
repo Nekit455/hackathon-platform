@@ -44,3 +44,9 @@ export const loginUser = async ({ email, password }) => {
 
   return { token, user: { id: user.id, email: user.email, name: user.name, role: user.role } };
 };
+
+export const getAllUsers = async () => {
+  return prisma.user.findMany({
+    select: { id: true, email: true, name: true, role: true, createdAt: true },
+  });
+};

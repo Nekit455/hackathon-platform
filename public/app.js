@@ -139,6 +139,7 @@ async function loadHackathons() {
         <div class="actions">
           ${currentUser.role === 'ADMIN' ? `<button class="btn btn-sm btn-primary" onclick="changeStatus('${h.id}', 'ONGOING')">Начать</button>` : ''}
           ${currentUser.role === 'ADMIN' ? `<button class="btn btn-sm btn-danger" onclick="changeStatus('${h.id}', 'FINISHED')">Завершить</button>` : ''}
+          ${currentUser.role === 'ADMIN' ? `<button class="btn btn-sm btn-primary" onclick="assignJudge('${h.id}')">Назначить судью</button>` : ''}
         </div>
       `;
       container.appendChild(div);
@@ -377,16 +378,163 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
   });
 });
 
-// --- Запуск ---
-document.addEventListener('DOMContentLoaded', () => {
-  if (token) {
-    showScreen('main');
-    loadUser();
-  } else {
-    showScreen('auth');
+// --- Оценки (Grades) ---
+async function loadGradesProjects() {
+  try {
+    const hacksData = await apiCall('/hackathons');
+    if (hacksData.data.hackathons.length === 0) {
+      document.getElementById('grades-project-select').innerHTML = '<option value="">Нет хакатонов</option>';
+      return;
+    }
+
+    let allProjects = [];
+    // Проходим по всем хакатонам и собираем их проекты
+    for (const h of hacksData.data.hackathons) {
+      const teamsData = await apiCall(`/hackathons/${h.id}/teams`);
+      teamsData.data.teams.forEach(t => {
+        if (t.project) {
+          allProjects.push({ ...t.project, hackathonId: h.id });
+        }
+      });
+    }
+
+    const select = document.getElementById('grades-project-select');
+    select.innerHTML = '<option value="">-- Выберите проект --</option>';
+    if (allProjects.length === 0) {
+      select.innerHTML = '<option value="">Нет проектов для оценки</option>';
+      return;
+    }
+    allProjects.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = `${p.title} (команда: ${p.team?.name || 'неизвестно'})`;
+      select.appendChild(opt);
+    });
+  } catch (err) { showMessage(err.message, true); }
+}
+
+// Обработчик выбора проекта
+document.getElementById('grades-project-select').onchange = async () => {
+  const projectId = document.getElementById('grades-project-select').value;
+  const form = document.getElementById('grade-create-form');
+  if (!projectId) {
+    form.classList.add('hidden');
+    document.getElementById('grades-list').innerHTML = '';
+    return;
   }
-  initAuth();
-  document.getElementById('btn-logout').onclick = logout;
+  form.classList.remove('hidden');
+  await loadProjectGrades(projectId);
+  await loadCriteriaForGrade(projectId);
+};
+
+// Загрузка оценок для проекта
+async function loadProjectGrades(projectId) {
+  try {
+    const data = await apiCall(`/projects/${projectId}/grades`);
+    const container = document.getElementById('grades-list');
+    container.innerHTML = '';
+
+    if (data.data.grades.length === 0) {
+      container.innerHTML = '<p>Оценок пока нет.</p>';
+      return;
+    }
+
+    data.data.grades.forEach(g => {
+      const div = document.createElement('div');
+      div.className = 'item-card';
+      div.innerHTML = `
+        <div class="meta">
+          <span><b>Судья:</b> ${g.judge.name}</span>
+          <span><b>Критерий:</b> ${g.criterion.name}</span>
+          <span><b>Балл:</b> ${g.score} / ${g.criterion.maxScore}</span>
+        </div>
+      `;
+      container.appendChild(div);
+    });
+  } catch (err) { showMessage(err.message, true); }
+}
+
+// Загрузка критериев для выбранного проекта (чтобы судья мог выбрать, за что ставить балл)
+async function loadCriteriaForGrade(projectId) {
+  try {
+    // Получаем данные проекта, чтобы узнать его хакатон
+    const projectData = await apiCall(`/projects/${projectId}`);
+    const hackathonId = projectData.data.project.team.hackathonId;
+
+    const criteriaData = await apiCall(`/hackathons/${hackathonId}/criteria`);
+    const select = document.getElementById('grade-criterion-select');
+    select.innerHTML = '<option value="">-- Выберите критерий --</option>';
+
+    criteriaData.data.criteria.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = `${c.name} (макс. ${c.maxScore})`;
+      select.appendChild(opt);
+    });
+  } catch (err) { /* игнорируем */ }
+}
+
+// Отправка оценки
+document.getElementById('form-create-grade').onsubmit = async (e) => {
+  e.preventDefault();
+  const projectId = document.getElementById('grades-project-select').value;
+  const criterionId = document.getElementById('grade-criterion-select').value;
+  const score = parseInt(document.getElementById('grade-score').value, 10);
+  if (!projectId || !criterionId) return;
+
+  try {
+    await apiCall(`/projects/${projectId}/grades`, {
+      method: 'POST',
+      body: JSON.stringify({ criterionId, score })
+    });
+    showMessage('Оценка успешно поставлена');
+    await loadProjectGrades(projectId); // обновляем список
+    document.getElementById('grade-score').value = ''; // очищаем поле
+  } catch (err) { showMessage(err.message, true); }
+};
+
+// Инициализация вкладки при переходе на неё
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.dataset.tab === 'grades') loadGradesProjects();
+  });
+});
+
+// --- Назначение судьи (для админа) ---
+async function assignJudge(hackathonId) {
+  try {
+    // Получаем список всех пользователей, чтобы найти судей
+    const usersData = await apiCall('/auth/users');
+    const judges = usersData.data.users.filter(u => u.role === 'JUDGE');
+    
+    if (judges.length === 0) {
+      alert('Нет пользователей с ролью JUDGE. Сначала создайте и повысьте роль через SQL.');
+      return;
+    }
+
+    // Спрашиваем, какого судью назначить
+    const selected = prompt(
+      `Выберите судью для назначения (введите номер):\n` +
+      judges.map((j, i) => `${i + 1}. ${j.name} (${j.email})`).join('\n')
+    );
+    if (!selected) return;
+    const judge = judges[parseInt(selected) - 1];
+    if (!judge) return alert('Неверный номер');
+
+    // Отправляем запрос на сервер
+    await apiCall(`/hackathons/${hackathonId}/judges`, {
+      method: 'POST',
+      body: JSON.stringify({ userId: judge.id })
+    });
+    showMessage(`Судья ${judge.name} назначен на хакатон`);
+  } catch (err) { showMessage(err.message, true); }
+}
+
+// Инициализация для вкладки оценок
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.dataset.tab === 'grades') loadGradesProjects();
+  });
 });
 
 // --- Приглашения ---
@@ -431,3 +579,16 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
     if (btn.dataset.tab === 'invitations') loadInvitations();
   });
 });
+
+// --- Запуск ---
+document.addEventListener('DOMContentLoaded', () => {
+  if (token) {
+    showScreen('main');
+    loadUser();
+  } else {
+    showScreen('auth');
+  }
+  initAuth();
+  document.getElementById('btn-logout').onclick = logout;
+});
+

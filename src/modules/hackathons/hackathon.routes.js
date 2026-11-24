@@ -1,6 +1,6 @@
 
 import { Router } from 'express';
-import { create, getAll, getById, update } from './hackathon.controller.js';
+import { create, getAll, getById, update, assignJudge } from './hackathon.controller.js';
 import { authenticate } from '../../middlewares/auth.js';
 import { requireRole } from '../../middlewares/role.js';
 
@@ -142,5 +142,7 @@ router.post('/', requireRole('ADMIN'), create);
  *         description: Хакатон не найден
  */
 router.patch('/:id', requireRole('ADMIN'), update);
+
+router.post('/:id/judges', requireRole('ADMIN'), assignJudge); // POST /api/hackathons/:id/judges
 
 export default router;

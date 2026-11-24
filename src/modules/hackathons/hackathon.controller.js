@@ -1,4 +1,4 @@
-import { createHackathonSchema, updateHackathonSchema } from './hackathon.schema.js';
+import { createHackathonSchema, updateHackathonSchema, assignJudgeSchema } from './hackathon.schema.js';
 import * as hackathonService from './hackathon.service.js';
 
 export const create = async (req, res, next) => {
@@ -38,6 +38,20 @@ export const update = async (req, res, next) => {
     const data = updateHackathonSchema.parse(req.body);
     const hackathon = await hackathonService.updateHackathon(req.params.id, data);
     res.json({ status: 'success', data: { hackathon } });
+  } catch (error) {
+    if (error.name === 'ZodError') {
+      error.status = 400;
+      error.message = error.issues.map(e => e.message).join(', ');
+    }
+    next(error);
+  }
+};
+
+export const assignJudge = async (req, res, next) => {
+  try {
+    const data = assignJudgeSchema.parse(req.body);
+    const assignment = await hackathonService.assignJudge(req.params.id, data.userId);
+    res.status(201).json({ status: 'success', data: { assignment } });
   } catch (error) {
     if (error.name === 'ZodError') {
       error.status = 400;

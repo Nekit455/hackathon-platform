@@ -1,6 +1,7 @@
 import { Router } from 'express';
-import { register, login, getMe } from './auth.controller.js';
+import { register, login, getMe, listUsers } from './auth.controller.js';
 import { authenticate } from '../../middlewares/auth.js';
+import { requireRole } from '../../middlewares/role.js';
 
 const router = Router();
 
@@ -78,5 +79,7 @@ router.post('/login', login);
  *         description: Не авторизован
  */
 router.get('/me', authenticate, getMe);
+
+router.get('/users', authenticate, requireRole('ADMIN'), listUsers);
 
 export default router;

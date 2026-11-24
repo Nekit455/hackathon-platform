@@ -48,6 +48,7 @@
       <button class="nav-btn" data-tab="teams">Команды</button>
       <button class="nav-btn" data-tab="projects">Проекты</button>
       <button class="nav-btn" data-tab="leaderboard">Лидерборд</button>
+      <button class="nav-btn" data-tab="grades">Оценки</button>
       <button class="nav-btn" data-tab="invitations">Приглашения</button>
     </nav>
 
@@ -106,6 +107,27 @@
             <textarea id="project-description" placeholder="Описание" rows="3" required></textarea>
             <input type="url" id="project-repo" placeholder="Ссылка на репозиторий" required>
             <button type="submit" class="btn btn-success">Отправить</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Оценки -->
+      <section id="tab-grades" class="tab-content">
+        <div class="card">
+          <h3>Выберите проект для оценивания</h3>
+          <select id="grades-project-select"></select>
+          <button id="btn-load-grades" class="btn btn-primary">Загрузить оценки</button>
+        </div>
+
+        <div id="grades-list" class="list-container"></div>
+
+        <!-- Форма оценки (только для судей) -->
+        <div id="grade-create-form" class="card hidden">
+          <h3>Поставить оценку</h3>
+          <form id="form-create-grade">
+            <select id="grade-criterion-select" required></select>
+            <input type="number" id="grade-score" placeholder="Балл" required min="0">
+            <button type="submit" class="btn btn-success">Оценить</button>
           </form>
         </div>
       </section>

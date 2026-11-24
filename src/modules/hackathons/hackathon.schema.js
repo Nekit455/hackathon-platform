@@ -25,3 +25,7 @@ export const updateHackathonSchema = z.object({
   message: 'endDate must be after startDate',
   path: ['endDate'],
 });
+
+export const assignJudgeSchema = z.object({
+  userId: z.string().uuid(),
+});
