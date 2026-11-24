@@ -393,7 +393,11 @@ async function loadGradesProjects() {
       const teamsData = await apiCall(`/hackathons/${h.id}/teams`);
       teamsData.data.teams.forEach(t => {
         if (t.project) {
-          allProjects.push({ ...t.project, hackathonId: h.id });
+          allProjects.push({ 
+            ...t.project, 
+            teamName: t.name, 
+            hackathonId: h.id 
+          });
         }
       });
     }
@@ -407,7 +411,7 @@ async function loadGradesProjects() {
     allProjects.forEach(p => {
       const opt = document.createElement('option');
       opt.value = p.id;
-      opt.textContent = `${p.title} (команда: ${p.team?.name || 'неизвестно'})`;
+      opt.textContent = `${p.title} (команда: ${p.teamName  || 'неизвестно'})`;
       select.appendChild(opt);
     });
   } catch (err) { showMessage(err.message, true); }

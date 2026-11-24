@@ -103,7 +103,10 @@ export const getGradesByProject = async (projectId, userId, userRole) => {
     if (userRole === 'JUDGE') {
       return prisma.grade.findMany({
         where: { projectId, judgeId: userId },
-        include: { criterion: true },
+        include: { 
+          criterion: true,
+          judge: { select: { id: true, email: true, name: true } }, 
+        },
       });
     }
     const error = new Error('Оценки будут видны только после завершения хакатона');
