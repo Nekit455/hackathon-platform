@@ -80,6 +80,44 @@ router.post('/login', login);
  */
 router.get('/me', authenticate, getMe);
 
+/**
+ * @swagger
+ * /api/auth/users:
+ *   get:
+ *     summary: Получить список всех пользователей (только ADMIN)
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Список пользователей
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     users:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           email:
+ *                             type: string
+ *                           name:
+ *                             type: string
+ *                           role:
+ *                             type: string
+ *                             enum: [PARTICIPANT, JUDGE, ADMIN]
+ *       401:
+ *         description: Не авторизован
+ *       403:
+ *         description: Недостаточно прав (не ADMIN)
+ */
 router.get('/users', authenticate, requireRole('ADMIN'), listUsers);
 
 export default router;

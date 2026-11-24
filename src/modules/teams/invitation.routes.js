@@ -11,22 +11,39 @@ router.use(authenticate);
  * /api/invitations/{id}/accept:
  *   post:
  *     summary: Принять приглашение в команду
+ *     tags: [Invitations]
  *     description: |
  *       Принимает приглашение текущего пользователя в команду.
  *       Идентификатор id — это ID записи участника (Member),
  *       созданной при отправке приглашения.
- *     tags: [Teams]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID приглашения (записи Member)
  *         schema:
  *           type: string
- *           format: uuid
+ *         description: ID приглашения (Member)
  *     responses:
  *       200:
- *         description: Приглашение успешно принято
+ *         description: Приглашение принято
+ *       403:
+ *         description: Приглашение предназначено другому пользователю
+ *       404:
+ *         description: Приглашение не найдено
+ *       409:
+ *         description: Приглашение уже принято
+ */
+router.post('/:id/accept', acceptInvitation); // POST /api/invitations/:id/accept
+
+/**
+ * @swagger
+ * /api/invitations:
+ *   get:
+ *     summary: Получить список входящих приглашений текущего пользователя
+ *     tags: [Invitations]
+ *     responses:
+ *       200:
+ *         description: Список приглашений
  *         content:
  *           application/json:
  *             schema:
@@ -34,24 +51,26 @@ router.use(authenticate);
  *               properties:
  *                 status:
  *                   type: string
- *                   example: success
  *                 data:
  *                   type: object
  *                   properties:
- *                     member:
- *                       type: object
- *                       description: Данные участника команды
+ *                     invitations:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           team:
+ *                             type: object
+ *                             properties:
+ *                               id:
+ *                                 type: string
+ *                               name:
+ *                                 type: string
  *       401:
- *         description: Не авторизован — отсутствует или недействителен JWT-токен
- *       403:
- *         description: Приглашение адресовано другому пользователю
- *       404:
- *         description: Приглашение не найдено
- *       409:
- *         description: Приглашение уже было принято
+ *         description: Не авторизован
  */
-router.post('/:id/accept', acceptInvitation); // POST /api/invitations/:id/accept
-
 router.get('/', listMyInvitations); // GET /api/invitations
 
 export default router;

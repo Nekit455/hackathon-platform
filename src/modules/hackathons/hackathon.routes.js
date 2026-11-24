@@ -143,6 +143,40 @@ router.post('/', requireRole('ADMIN'), create);
  */
 router.patch('/:id', requireRole('ADMIN'), update);
 
+/**
+ * @swagger
+ * /api/hackathons/{id}/judges:
+ *   post:
+ *     summary: Назначить судью на хакатон (только ADMIN)
+ *     tags: [Hackathons]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID хакатона
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [userId]
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: ID пользователя с ролью JUDGE
+ *     responses:
+ *       201:
+ *         description: Судья назначен
+ *       400:
+ *         description: Пользователь не имеет роли JUDGE или ошибка валидации
+ *       404:
+ *         description: Хакатон или пользователь не найден
+ *       409:
+ *         description: Судья уже назначен на этот хакатон
+ */
 router.post('/:id/judges', requireRole('ADMIN'), assignJudge); // POST /api/hackathons/:id/judges
 
 export default router;

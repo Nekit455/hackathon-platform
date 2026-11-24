@@ -9,21 +9,21 @@ export const getLeaderboard = async (hackathonId) => {
   });
 
   if (!hackathon) {
-    const error = new Error('Hackathon not found');
+    const error = new Error('Хакатон не найден');
     error.status = 404;
     throw error;
   }
 
   // Статус хакатона должен быть FINISHED
   if (hackathon.status !== 'FINISHED') {
-    const error = new Error('Leaderboard is only available after the hackathon is finished');
+    const error = new Error('Лидерборд будет доступен только после завершения хакатона');
     error.status = 403;
     throw error;
   }
   
   // Дата окончания хакатона в прошлом
   if (new Date() < new Date(hackathon.endDate)) {
-    const error = new Error('Leaderboard is only available after the hackathon end date');
+    const error = new Error('Дата окончания хакатона должна быть в прошлом');
     error.status = 403;
     throw error;
   }

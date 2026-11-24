@@ -9,7 +9,7 @@ const BCRYPT_ROUNDS = parseInt(process.env.BCRYPT_ROUNDS || '10', 10);
 export const registerUser = async ({ email, name, password }) => {
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {
-    const error = new Error('User with this email already exists');
+    const error = new Error('Пользователь с таким email уже зарегистрирован');
     error.status = 409;
     throw error;
   }

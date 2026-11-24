@@ -3,7 +3,7 @@ import prisma from '../../prisma.js';
 export const createCriterion = async (hackathonId, data) => {
   const hackathon = await prisma.hackathon.findUnique({ where: { id: hackathonId } });
   if (!hackathon) {
-    const error = new Error('Hackathon not found');
+    const error = new Error('Хакатон не найден');
     error.status = 404;
     throw error;
   }
@@ -16,7 +16,7 @@ export const createCriterion = async (hackathonId, data) => {
 export const getCriteriaByHackathon = async (hackathonId) => {
   const hackathon = await prisma.hackathon.findUnique({ where: { id: hackathonId } });
   if (!hackathon) {
-    const error = new Error('Hackathon not found');
+    const error = new Error('Хакатон не найден');
     error.status = 404;
     throw error;
   }
@@ -30,7 +30,7 @@ export const getCriteriaByHackathon = async (hackathonId) => {
 export const updateCriterion = async (id, data) => {
   const criterion = await prisma.criterion.findUnique({ where: { id } });
   if (!criterion) {
-    const error = new Error('Criterion not found');
+    const error = new Error('Критерий не найден');
     error.status = 404;
     throw error;
   }
@@ -44,7 +44,7 @@ export const updateCriterion = async (id, data) => {
 export const deleteCriterion = async (id) => {
   const criterion = await prisma.criterion.findUnique({ where: { id } });
   if (!criterion) {
-    const error = new Error('Criterion not found');
+    const error = new Error('Критерий не найден');
     error.status = 404;
     throw error;
   }

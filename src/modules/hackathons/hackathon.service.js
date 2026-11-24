@@ -20,7 +20,7 @@ export const getHackathonById = async (id) => {
   });
 
   if (!hackathon) {
-    const error = new Error('Hackathon not found');
+    const error = new Error('Хакатон не найден');
     error.status = 404;
     throw error;
   }
@@ -31,7 +31,7 @@ export const getHackathonById = async (id) => {
 export const updateHackathon = async (id, data) => {
   const hackathon = await prisma.hackathon.findUnique({ where: { id } });
   if (!hackathon) {
-    const error = new Error('Hackathon not found');
+    const error = new Error('Хакатон не найден');
     error.status = 404;
     throw error;
   }
@@ -45,20 +45,20 @@ export const updateHackathon = async (id, data) => {
 export const assignJudge = async (hackathonId, userId) => {
   const hackathon = await prisma.hackathon.findUnique({ where: { id: hackathonId } });
   if (!hackathon) {
-    const error = new Error('Hackathon not found');
+    const error = new Error('Хакатон не найден');
     error.status = 404;
     throw error;
   }
 
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) {
-    const error = new Error('User not found');
+    const error = new Error('Пользователь не найден');
     error.status = 404;
     throw error;
   }
 
   if (user.role !== 'JUDGE') {
-    const error = new Error('User must have JUDGE role');
+    const error = new Error('Пользователь должен иметь роль "СУДЬЯ"');
     error.status = 400;
     throw error;
   }
@@ -67,7 +67,7 @@ export const assignJudge = async (hackathonId, userId) => {
     where: { hackathonId_userId: { hackathonId, userId } },
   });
   if (existingAssignment) {
-    const error = new Error('User is already a judge for this hackathon');
+    const error = new Error('Пользователь уже является судьей этого хакатона');
     error.status = 409;
     throw error;
   }
