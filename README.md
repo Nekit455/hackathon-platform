@@ -106,7 +106,7 @@ REST API для платформы организации хакатонов. П
 src/  
 ├── config/  
 │   └── swagger.js           # Конфигурация Swagger  
-├── middlewares/
+├── middlewares/  
 │   ├── auth.js              # Проверка JWT  
 │   ├── role.js              # Проверка роли  
 │   └── errorHandler.js      # Глобальный обработчик ошибок  
