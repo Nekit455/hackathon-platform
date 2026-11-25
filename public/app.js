@@ -98,6 +98,7 @@ function logout() {
   currentUser = null;
   localStorage.removeItem('token');
   showScreen('auth');
+  window.location.reload();
 }
 
 // --- Хакатоны ---
@@ -179,8 +180,11 @@ document.getElementById('form-create-hackathon').onsubmit = async (e) => {
 // --- Лидерборд ---
 document.getElementById('btn-load-leaderboard').onclick = async () => {
   const hackathonId = document.getElementById('leaderboard-hackathon-select').value;
-  if (!hackathonId) return showMessage('Выберите хакатон', true);
-  
+  if (!hackathonId) {
+    container.innerHTML = '';
+    return showMessage('Выберите хакатон', true);
+  }
+
   try {
     const data = await apiCall(`/hackathons/${hackathonId}/leaderboard`);
     const container = document.getElementById('leaderboard-list');
@@ -240,7 +244,9 @@ async function loadTeamsHackathons() {
 document.getElementById('teams-hackathon-select').onchange = () => {
   const hackathonId = document.getElementById('teams-hackathon-select').value;
   document.getElementById('team-create-form').classList.toggle('hidden', !hackathonId);
-  if (hackathonId) loadTeams(hackathonId);
+  if (hackathonId) {
+    loadTeams(hackathonId);
+  } else document.getElementById('teams-list').innerHTML = '';
 };
 
 document.getElementById('btn-load-teams').onclick = () => {
@@ -324,7 +330,7 @@ async function loadProjectsTeams() {
 document.getElementById('projects-team-select').onchange = () => {
   const teamId = document.getElementById('projects-team-select').value;
   document.getElementById('project-create-form').classList.toggle('hidden', !teamId);
-  if (teamId) loadProject(teamId);
+  if (teamId) loadProject(teamId); else document.getElementById('projects-list').innerHTML = '';
 };
 
 document.getElementById('btn-load-projects').onclick = () => {
@@ -423,6 +429,7 @@ document.getElementById('grades-project-select').onchange = async () => {
   const form = document.getElementById('grade-create-form');
   if (!projectId) {
     form.classList.add('hidden');
+    list.innerHTML = '';
     document.getElementById('grades-list').innerHTML = '';
     return;
   }

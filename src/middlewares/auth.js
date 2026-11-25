@@ -21,7 +21,7 @@ export const authenticate = async (req, res, next) => {
     }
 
     // Прикрепляем пользователя к запросу для дальнейшего использования
-    req.user = { id: user.id, email: user.email, role: user.role };
+    req.user = { id: user.id, email: user.email, name: user.name, role: user.role };
     next();
   } catch (error) {
     if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
