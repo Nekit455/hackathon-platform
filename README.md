@@ -34,11 +34,11 @@ REST API для платформы организации хакатонов. П
    JWT_EXPIRES_IN=7d
    BCRYPT_ROUNDS=10
 
-PORT	        Порт, на котором запускается сервер
-DATABASE_URL	Строка подключения к PostgreSQL (для локального запуска без Docker)
-JWT_SECRET	Секретный ключ для подписи JWT
-JWT_EXPIRES_IN	Время жизни JWT-токена
-BCRYPT_ROUNDS	Количество раундов хеширования bcrypt
+- PORT	        Порт, на котором запускается сервер
+- DATABASE_URL	Строка подключения к PostgreSQL (для локального запуска без Docker)
+- JWT_SECRET	Секретный ключ для подписи JWT
+- JWT_EXPIRES_IN	Время жизни JWT-токена
+- BCRYPT_ROUNDS	Количество раундов хеширования bcrypt
 
 **Важно**: при запуске через docker-compose строка DATABASE_URL переопределяется внутри контейнера 
 (см. docker-compose.yml), так как приложение обращается к базе по имени сервиса db, а не через localhost
