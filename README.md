@@ -110,7 +110,7 @@ src/
 │   ├── auth.js              # Проверка JWT  
 │   ├── role.js              # Проверка роли  
 │   └── errorHandler.js      # Глобальный обработчик ошибок  
-├── modules/ 
+├── modules/  
 │   ├── auth/                # Регистрация, логин, /me  
 │   ├── hackathons/          # CRUD хакатонов  
 │   ├── criteria/            # Критерии оценивания  
