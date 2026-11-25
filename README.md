@@ -23,7 +23,7 @@ REST API для платформы организации хакатонов. П
 
 1. **Склонируйте репозиторий:**
    ```bash
-   git clone [<URL>](https://github.com/Nekit455/hackathon-platform.git)
+   git clone https://github.com/Nekit455/hackathon-platform.git
    cd hackathon-platform
 
 2. **Создайте файл .env (пример)**
